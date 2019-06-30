@@ -4,15 +4,17 @@ import style from './header.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 
+import SideNav from './SideNav/sidenav'
 
 
-
-const Header = () => {
+const Header = (props) => {
 
     const navBars = () => (
 
         <div className={style.bars}>
-             <FontAwesomeIcon icon={faBars} 
+             <FontAwesomeIcon icon={faBars}
+             onClick={props.onOpenNav}
+             
              style={{
                  color:'#dfdfdf',
                  padding:'10px',
@@ -30,6 +32,9 @@ const Header = () => {
 
     return (
         <header className={style.header}>
+
+        <SideNav {...props}/>
+
             <div className={style.headerOpt}>
                 {navBars()}
                 {logo()}

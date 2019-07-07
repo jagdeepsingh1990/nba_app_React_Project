@@ -10,7 +10,7 @@ import CardInfo from '../../widgets/CardInfo/cardinfo'
 class NewsList extends Component {
 
     state = {
-        teams:[],
+        teams: [],
         items: [],
         start: this.props.start,
         end: this.props.start + this.props.amount,
@@ -22,19 +22,21 @@ class NewsList extends Component {
 
     request = (start, end) => {
 
-        if(this.state.teams.length < 1) {
+        if (this.state.teams.length < 1) {
             axios.get(`${URL}/teams`)
-            .then(response=>{
-                this.setState({
-                    teams:response.data
+                .then(response => {
+                    this.setState({
+                        teams: response.data
+                    })
                 })
-            })
         }
 
 
         axios.get(`${URL}/articles?_start=${start}&_end=${end}`).then(response => {
             this.setState({
-                items: [...this.state.items, ...response.data]
+                items: [...this.state.items, ...response.data],
+                start,
+                end
             })
         })
     }
@@ -62,7 +64,7 @@ class NewsList extends Component {
                         <div>
                             <div className={styles.newlist_item}>
                                 <Link to={`articles/${item.id}`}>
-                                    <CardInfo teams={this.state.teams} team={item.team} date={item.date}/>
+                                    <CardInfo teams={this.state.teams} team={item.team} date={item.date} />
                                     <h2>{item.title}</h2>
                                 </Link>
                             </div>
@@ -71,32 +73,60 @@ class NewsList extends Component {
 
                 ))
                 break;
-            default:
-                template = null;
+            case ('cardMain'):
+                template = this.state.items.map((item, i) => (
+                    <CSSTransition
+                        classNames={{
+                            enter: styles.newsList_wrapper,
+                            enterActive: styles.newsList_wrapper_enter
+                        }}
+                        timeout={500}
+                        key={i}
+                    >
+                        <Link to={`/articles/${item.id}`}>
+                            <div className={styles.flex_Wrapper}>
+                                <div className={styles.left}
+                                    style={{
+                                        background: `url('/images/articles/${item.image}')`
+                                    }}>
+                                    <div></div>
+                                </div>
+                                <div className={styles.right}>
+                                <CardInfo teams={this.state.teams} team={item.team} date={item.date} />
+                                    <h2>{item.title}</h2>
+
+                                </div>
+                            </div>
+                        </Link>
+                    </CSSTransition>
+                        ))
+                    break;
+                default:
+                    template = null;
+            }
+            return template
         }
-        return template
-    }
     render() {
         
         return (
             <div>
-                <TransitionGroup
-                    component="div"
-                    className="list"
-                >
-                    {this.renderNews(this.props.type)}
+                            <TransitionGroup
+                                component="div"
+                                className="list"
+                            >
+                                {this.renderNews(this.props.type)}
 
-                </TransitionGroup>
+                            </TransitionGroup>
 
-                <Button
-                    type="loadmore"
-                    loadMore={()=>this.loadMore()}
-                    cta="Load More News"
-                />
+                            <Button
+                                type="loadmore"
+                                loadMore={() => this.loadMore()}
+                                cta="Load More News"
+                            />
 
-               
-            </div>
-        )
-    }
-}
+
+                        </div>
+                        )
+                    }
+                }
 export default NewsList;
